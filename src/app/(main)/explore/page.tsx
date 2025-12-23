@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Search, TrendingUp, ChevronRight } from 'lucide-react'
-import { ProjectCard, CategoryCard, CategoryChips } from '@/components'
+import { ProjectCard, CategoryCard } from '@/components'
 import { useAuth } from '@/contexts/AuthContext'
 import type { Project, Category } from '@/types'
 
-export default function ExplorePage() {
+function ExploreContent() {
     const { user } = useAuth()
     const searchParams = useSearchParams()
     const initialCategory = searchParams.get('category')
@@ -35,6 +35,7 @@ export default function ExplorePage() {
 
     useEffect(() => {
         fetchProjects()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedCategory, searchQuery, user])
 
     async function fetchCategories() {
@@ -205,5 +206,17 @@ export default function ExplorePage() {
                 </section>
             </main>
         </>
+    )
+}
+
+export default function ExplorePage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#44e47e]"></div>
+            </div>
+        }>
+            <ExploreContent />
+        </Suspense>
     )
 }

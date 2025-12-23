@@ -1,0 +1,43 @@
+{
+  "name": "bote-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate --schema=./prisma/schema.prisma && next build",
+    "start": "next start",
+    "lint": "eslint",
+    "postinstall": "prisma generate --schema=./prisma/schema.prisma",
+    "db:push": "prisma db push --schema=./prisma/schema.prisma",
+    "db:seed": "npx tsx prisma/seed.ts",
+    "db:studio": "prisma studio --schema=./prisma/schema.prisma"
+  },
+  "prisma": {
+    "schema": "./prisma/schema.prisma",
+    "seed": "npx tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@farcaster/frame-sdk": "^0.1.12",
+    "@prisma/client": "^5.22.0",
+    "@vercel/blob": "^2.0.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.562.0",
+    "next": "16.1.1",
+    "ox": "^0.11.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.4.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+:root {
+  /* Bote App Color Palette */
+  --primary: #44e47e;
+  --primary-hover: #3bc96e;
+  --background-dark: #0F0F0F;
+  --surface-dark: #1A1A1A;
+  --surface-highlight: #262626;
+  --card-border: rgba(255, 255, 255, 0.08);
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0A0;
+  --text-muted: #6B7280;
+
+  /* Vote colors */
+  --vote-up: #4ADE80;
+  --vote-down: #F87171;
+
+  /* Status colors */
+  --featured: #3B82F6;
+  --trending: #EAB308;
+  --new: #A855F7;
+
+  /* For dark mode (default) */
+  --background: #0F0F0F;
+  --foreground: #FFFFFF;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-surface: var(--surface-dark);
+  --color-surface-highlight: var(--surface-highlight);
+  --color-card-border: var(--card-border);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-vote-up: var(--vote-up);
+  --color-vote-down: var(--vote-down);
+  --font-sans: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--background-dark);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--surface-highlight);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Hide scrollbar for horizontal scroll areas */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glass effect */
+.glass-panel {
+  background: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-panel-strong {
+  background: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Image overlay gradient */
+.image-overlay-gradient {
+  background: linear-gradient(to bottom, rgba(15, 15, 15, 0.2) 0%, rgba(15, 15, 15, 0.8) 60%, rgba(15, 15, 15, 1) 100%);
+}
+
+/* Primary glow effect */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(68, 228, 126, 0.3);
+}
+
+.glow-primary-hover:hover {
+  box-shadow: 0 0 30px rgba(68, 228, 126, 0.5);
+}
+
+/* Animation utilities */
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Safe area for bottom navigation */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Focus styles */
+input:focus,
+button:focus {
+  outline: none;
+}
+
+input:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* Selection */
+::selection {
+  background: var(--primary);
+  color: var(--background-dark);
+}

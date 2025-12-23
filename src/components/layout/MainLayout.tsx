@@ -9,9 +9,13 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
     return (
         <AuthProvider>
-            <div className="min-h-screen bg-[#0F0F0F] text-white pb-24">
-                {children}
-                <BottomNav />
+            {/* Full screen dark background */}
+            <div className="min-h-screen bg-[#0a0a0a] flex justify-center">
+                {/* Mobile container - centered */}
+                <div className="relative w-full max-w-[430px] min-h-screen bg-[#0F0F0F] text-white pb-24 shadow-2xl">
+                    {children}
+                    <BottomNav />
+                </div>
             </div>
         </AuthProvider>
     )

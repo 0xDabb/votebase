@@ -348,9 +348,9 @@ export default function ProjectDetailPage() {
                         <Compass style={{ width: '24px', height: '24px', color: '#666' }} />
                         <span style={{ fontSize: '10px', color: '#666' }}>Explore</span>
                     </Link>
-                    <Link href="/create" style={{ position: 'relative', top: '-20px', textDecoration: 'none' }}>
-                        <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#49df80', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 24px rgba(73,223,128,0.4)' }}>
-                            <Plus style={{ width: '28px', height: '28px', color: '#000', strokeWidth: 2.5 }} />
+                    <Link href="/" style={{ position: 'relative', top: '-20px', textDecoration: 'none' }}>
+                        <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#49df80', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 24px rgba(73,223,128,0.4)', overflow: 'hidden', padding: '8px' }}>
+                            <img src="/icon.png" alt="VoteBase" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
                     </Link>
                     <Link href="/notifications" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>

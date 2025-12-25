@@ -2,222 +2,196 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowUp, MessageCircle, Reply, Star, Bell, Check, CheckCheck } from 'lucide-react'
+import { ArrowUp, Clock, Home, Compass, Bell, User, Zap } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { formatTimeAgo } from '@/lib/utils'
-import type { Notification } from '@/types'
 
-const notificationIcons: Record<string, React.ReactNode> = {
-    UPVOTE: <ArrowUp className="w-5 h-5" />,
-    COMMENT: <MessageCircle className="w-5 h-5" />,
-    REPLY: <Reply className="w-5 h-5" />,
-    FEATURED: <Star className="w-5 h-5" />,
-    SYSTEM: <Bell className="w-5 h-5" />,
-}
-
-const notificationColors: Record<string, string> = {
-    UPVOTE: 'bg-[#4ADE80]/20 text-[#4ADE80]',
-    COMMENT: 'bg-blue-500/20 text-blue-400',
-    REPLY: 'bg-purple-500/20 text-purple-400',
-    FEATURED: 'bg-yellow-500/20 text-yellow-400',
-    SYSTEM: 'bg-gray-500/20 text-gray-400',
+interface UpvoteActivity {
+    id: string
+    createdAt: Date
+    project: {
+        id: string
+        name: string
+        tagline: string
+        upvoteCount: number
+        category?: {
+            name: string
+            color: string
+        }
+    }
 }
 
 export default function NotificationsPage() {
     const { user, loading: authLoading } = useAuth()
-    const [notifications, setNotifications] = useState<Notification[]>([])
-    const [unreadCount, setUnreadCount] = useState(0)
+    const [activities, setActivities] = useState<UpvoteActivity[]>([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         if (user) {
-            fetchNotifications()
+            fetchActivities()
         }
     }, [user])
 
-    async function fetchNotifications() {
+    async function fetchActivities() {
         if (!user) return
 
         setLoading(true)
         try {
-            const res = await fetch(`/api/users/${user.id}/notifications`)
+            const res = await fetch(`/api/users/${user.id}/activities`)
             const data = await res.json()
 
             if (data.success) {
-                setNotifications(data.data)
-                setUnreadCount(data.unreadCount)
+                setActivities(data.data)
             }
         } catch (error) {
-            console.error('Error fetching notifications:', error)
+            console.error('Error fetching activities:', error)
         } finally {
             setLoading(false)
         }
     }
 
-    async function markAllAsRead() {
-        if (!user) return
+    const fmt = (n: number) => n >= 1000 ? (n / 1000).toFixed(1).replace('.0', '') + 'k' : n.toString()
 
-        try {
-            await fetch(`/api/users/${user.id}/notifications`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ markAllAsRead: true }),
-            })
-
-            setNotifications(prev => prev.map(n => ({ ...n, read: true })))
-            setUnreadCount(0)
-        } catch (error) {
-            console.error('Error marking as read:', error)
-        }
-    }
-
-    async function markAsRead(notificationId: string) {
-        if (!user) return
-
-        try {
-            await fetch(`/api/users/${user.id}/notifications`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ notificationIds: [notificationId] }),
-            })
-
-            setNotifications(prev =>
-                prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
-            )
-            setUnreadCount(prev => Math.max(0, prev - 1))
-        } catch (error) {
-            console.error('Error marking as read:', error)
-        }
+    const timeAgo = (date: Date) => {
+        const mins = Math.floor((Date.now() - new Date(date).getTime()) / 60000)
+        if (mins < 1) return 'Just now'
+        if (mins < 60) return `${mins}m ago`
+        if (mins < 1440) return `${Math.floor(mins / 60)}h ago`
+        if (mins < 10080) return `${Math.floor(mins / 1440)}d ago`
+        return new Date(date).toLocaleDateString()
     }
 
     if (authLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="w-8 h-8 border-2 border-[#44e47e] border-t-transparent rounded-full animate-spin" />
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a' }}>
+                <div style={{ width: '32px', height: '32px', border: '2px solid #49df80', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
             </div>
         )
     }
 
     if (!user) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
-                <div className="w-20 h-20 rounded-full bg-[#1A1A1A] flex items-center justify-center mb-4">
-                    <Bell className="w-10 h-10 text-[#A0A0A0]" />
+            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a', padding: '20px', textAlign: 'center' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#161616', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                    <span style={{ fontSize: '40px' }}>🔐</span>
                 </div>
-                <h1 className="text-2xl font-bold text-white mb-2">Sign In Required</h1>
-                <p className="text-[#A0A0A0]">Connect with Farcaster to view notifications</p>
+                <h1 style={{ color: '#fff', fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>Sign In Required</h1>
+                <p style={{ color: '#888', marginBottom: '24px' }}>Connect with Farcaster to view your activity</p>
+                <p style={{ color: '#666', fontSize: '12px' }}>Open this app in Warpcast to sign in automatically</p>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen">
+        <div style={{ minHeight: '100vh', background: '#0a0a0a', paddingBottom: '120px' }}>
             {/* Header */}
-            <header className="sticky top-0 z-40 bg-[#0F0F0F]/80 backdrop-blur-md border-b border-white/5">
-                <div className="flex items-center justify-between px-4 py-3 pt-12">
-                    <div className="flex items-center gap-2">
-                        <h2 className="text-white text-lg font-bold">Notifications</h2>
-                        {unreadCount > 0 && (
-                            <span className="px-2 py-0.5 rounded-full bg-[#44e47e] text-black text-xs font-bold">
-                                {unreadCount}
-                            </span>
-                        )}
-                    </div>
-                    {unreadCount > 0 && (
-                        <button
-                            onClick={markAllAsRead}
-                            className="flex items-center gap-1 text-sm text-[#44e47e] hover:opacity-80"
-                        >
-                            <CheckCheck className="w-4 h-4" />
-                            Mark all read
-                        </button>
-                    )}
-                </div>
-            </header>
+            <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '16px 20px', paddingTop: '48px', background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid #1a1a1a' }}>
+                <h2 style={{ color: '#fff', fontSize: '24px', fontWeight: 700 }}>Activity</h2>
+                <p style={{ color: '#888', fontSize: '14px', marginTop: '4px' }}>Your voting history</p>
+            </div>
 
-            {/* Notifications List */}
-            <div className="px-4 py-4">
+            {/* Activity List */}
+            <div style={{ padding: '20px' }}>
                 {loading ? (
-                    <div className="space-y-3">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {[...Array(5)].map((_, i) => (
-                            <div key={i} className="h-20 bg-[#1A1A1A] rounded-2xl animate-pulse" />
+                            <div key={i} style={{ height: '100px', borderRadius: '16px', background: '#161616', animation: 'pulse 2s infinite' }} />
                         ))}
                     </div>
-                ) : notifications.length > 0 ? (
-                    <div className="space-y-3">
-                        {notifications.map((notification) => {
-                            const projectId = (notification.data as Record<string, string>)?.projectId
-
-                            return (
-                                <div
-                                    key={notification.id}
-                                    className={`relative p-4 rounded-2xl border transition-all ${notification.read
-                                            ? 'bg-[#1A1A1A] border-white/5'
-                                            : 'bg-[#1A1A1A] border-[#44e47e]/30'
-                                        }`}
-                                >
-                                    {/* Unread indicator */}
-                                    {!notification.read && (
-                                        <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-[#44e47e]" />
-                                    )}
-
-                                    <div className="flex gap-3">
+                ) : activities.length > 0 ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {activities.map((activity) => (
+                            <Link href={`/projects/${activity.project.id}`} key={activity.id} style={{ textDecoration: 'none' }}>
+                                <div style={{ padding: '16px', borderRadius: '16px', background: '#161616', border: '1px solid rgba(255,255,255,0.06)', transition: 'all 0.2s' }}>
+                                    <div style={{ display: 'flex', gap: '12px' }}>
                                         {/* Icon */}
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${notificationColors[notification.type] || notificationColors.SYSTEM
-                                            }`}>
-                                            {notificationIcons[notification.type] || notificationIcons.SYSTEM}
+                                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#49df8020', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            <ArrowUp style={{ width: '20px', height: '20px', color: '#49df80' }} />
                                         </div>
 
                                         {/* Content */}
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-semibold text-white">{notification.title}</p>
-                                            {notification.message && (
-                                                <p className="text-xs text-[#A0A0A0] mt-0.5 line-clamp-2">
-                                                    {notification.message}
-                                                </p>
-                                            )}
-                                            <p className="text-[10px] text-[#A0A0A0] mt-1">
-                                                {formatTimeAgo(notification.createdAt)}
+                                        <div style={{ flex: 1, minWidth: 0 }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                                <span style={{ color: '#fff', fontSize: '14px', fontWeight: 600 }}>You upvoted</span>
+                                                {activity.project.category && (
+                                                    <span style={{
+                                                        padding: '2px 8px',
+                                                        borderRadius: '8px',
+                                                        background: `${activity.project.category.color}20`,
+                                                        color: activity.project.category.color,
+                                                        fontSize: '10px',
+                                                        fontWeight: 600
+                                                    }}>
+                                                        {activity.project.category.name}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <h3 style={{ color: '#fff', fontSize: '16px', fontWeight: 700, marginBottom: '4px' }}>
+                                                {activity.project.name}
+                                            </h3>
+
+                                            <p style={{ color: '#888', fontSize: '13px', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                {activity.project.tagline}
                                             </p>
+
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#666' }}>
+                                                    <Clock style={{ width: '12px', height: '12px' }} />
+                                                    <span style={{ fontSize: '11px' }}>{timeAgo(activity.createdAt)}</span>
+                                                </div>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                    <ArrowUp style={{ width: '12px', height: '12px', color: '#49df80' }} />
+                                                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#49df80' }}>
+                                                        {fmt(activity.project.upvoteCount)}
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    {/* Actions */}
-                                    <div className="flex items-center gap-2 mt-3">
-                                        {projectId && (
-                                            <Link
-                                                href={`/projects/${projectId}`}
-                                                className="px-3 py-1.5 rounded-full bg-white/5 text-xs text-white hover:bg-white/10 transition-colors"
-                                            >
-                                                View Project
-                                            </Link>
-                                        )}
-                                        {!notification.read && (
-                                            <button
-                                                onClick={() => markAsRead(notification.id)}
-                                                className="px-3 py-1.5 rounded-full text-xs text-[#A0A0A0] hover:text-white transition-colors flex items-center gap-1"
-                                            >
-                                                <Check className="w-3 h-3" />
-                                                Mark read
-                                            </button>
-                                        )}
-                                    </div>
                                 </div>
-                            )
-                        })}
+                            </Link>
+                        ))}
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-16 h-16 rounded-full bg-[#1A1A1A] flex items-center justify-center mb-4">
-                            <Bell className="w-8 h-8 text-[#A0A0A0]" />
+                    <div style={{ textAlign: 'center', padding: '48px 20px' }}>
+                        <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#161616', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                            <Bell style={{ width: '32px', height: '32px', color: '#666' }} />
                         </div>
-                        <h3 className="text-lg font-semibold text-white mb-1">No notifications yet</h3>
-                        <p className="text-sm text-[#A0A0A0]">
-                            We&apos;ll notify you when something happens
-                        </p>
+                        <h3 style={{ color: '#fff', fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>No Activity Yet</h3>
+                        <p style={{ color: '#888', marginBottom: '24px' }}>Start upvoting projects to see your activity here</p>
+                        <Link href="/" style={{ display: 'inline-block', padding: '12px 24px', borderRadius: '12px', background: '#49df80', color: '#000', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>
+                            Explore Projects
+                        </Link>
                     </div>
                 )}
             </div>
+
+            {/* Bottom Nav */}
+            <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, padding: '12px 24px 32px 24px', background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid #1a1a1a' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: '360px', margin: '0 auto' }}>
+                    <Link href="/" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+                        <Home style={{ width: '24px', height: '24px', color: '#666' }} />
+                        <span style={{ fontSize: '10px', color: '#666' }}>Home</span>
+                    </Link>
+                    <Link href="/explore" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+                        <Compass style={{ width: '24px', height: '24px', color: '#666' }} />
+                        <span style={{ fontSize: '10px', color: '#666' }}>Explore</span>
+                    </Link>
+                    <Link href="/" style={{ position: 'relative', top: '-20px', textDecoration: 'none' }}>
+                        <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#49df80', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 24px rgba(73,223,128,0.4)', overflow: 'hidden', padding: '8px' }}>
+                            <img src="/icon.png" alt="VoteBase" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        </div>
+                    </Link>
+                    <Link href="/notifications" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+                        <Bell style={{ width: '24px', height: '24px', color: '#49df80', fill: '#49df80' }} />
+                        <span style={{ fontSize: '10px', color: '#49df80' }}>Activity</span>
+                    </Link>
+                    <Link href="/profile" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+                        <User style={{ width: '24px', height: '24px', color: '#666' }} />
+                        <span style={{ fontSize: '10px', color: '#666' }}>Profile</span>
+                    </Link>
+                </div>
+            </nav>
         </div>
     )
 }

@@ -70,7 +70,7 @@ export default function ProjectDetailPage() {
     }
 
     const fmt = (n: number) => n >= 1000 ? (n / 1000).toFixed(1).replace('.0', '') + 'k' : n.toString()
-    const timeAgo = (date: string) => {
+    const timeAgo = (date: string | Date) => {
         const mins = Math.floor((Date.now() - new Date(date).getTime()) / 60000)
         if (mins < 60) return `${mins}m ago`
         if (mins < 1440) return `${Math.floor(mins / 60)}h ago`

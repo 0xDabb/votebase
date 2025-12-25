@@ -1,0 +1,12 @@
+{
+    "frame": {
+        "version": "1",
+        "name": "Bote App",
+        "iconUrl": "https://dreamy-mermaid-13209a.netlify.app/icon.png",
+        "homeUrl": "https://dreamy-mermaid-13209a.netlify.app",
+        "imageUrl": "https://dreamy-mermaid-13209a.netlify.app/og-image.png",
+        "buttonTitle": "Open Bote App",
+        "splashImageUrl": "https://dreamy-mermaid-13209a.netlify.app/icon.png",
+        "splashBackgroundColor": "#0F0F0F"
+    }
+}

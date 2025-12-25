@@ -8,26 +8,28 @@ const inter = Inter({
   display: "swap",
 });
 
+
 export const metadata: Metadata = {
-  title: "Bote - Discover & Vote for Projects",
+  title: "VoteBase - Discover & Vote for Projects",
   description: "Discover amazing projects, upvote your favorites, and connect with builders on Farcaster.",
   keywords: ["farcaster", "projects", "upvote", "builders", "discover"],
-  authors: [{ name: "Bote Team" }],
+  authors: [{ name: "VoteBase Team" }],
   openGraph: {
-    title: "Bote - Discover & Vote for Projects",
+    title: "VoteBase - Discover & Vote for Projects",
     description: "Discover amazing projects, upvote your favorites, and connect with builders.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bote - Discover & Vote for Projects",
+    title: "VoteBase - Discover & Vote for Projects",
     description: "Discover amazing projects, upvote your favorites, and connect with builders.",
+
   },
   other: {
     "fc:frame": "vNext",
     "fc:frame:image": "https://dreamy-mermaid-13209a.netlify.app/og-image.png",
-    "fc:frame:button:1": "Open Bote App",
+    "fc:frame:button:1": "Open VoteBase",
     "fc:frame:button:1:action": "launch_frame",
     "fc:frame:button:1:target": "https://dreamy-mermaid-13209a.netlify.app",
   },

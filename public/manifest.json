@@ -1,6 +1,6 @@
 {
-  "name": "Bote App",
-  "short_name": "Bote",
+  "name": "VoteBase",
+  "short_name": "VoteBase",
   "description": "Discover amazing projects, upvote your favorites, and connect with builders on Farcaster.",
   "start_url": "/",
   "display": "standalone",

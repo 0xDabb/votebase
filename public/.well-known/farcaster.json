@@ -1,11 +1,16 @@
 {
+    "accountAssociation": {
+        "header": "eyJmaWQiOjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIn0",
+        "payload": "eyJkb21haW4iOiJkcmVhbXktbWVybWFpZC0xMzIwOWEubmV0bGlmeS5hcHAifQ",
+        "signature": "MHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMA"
+    },
     "frame": {
         "version": "1",
-        "name": "Bote App",
+        "name": "VoteBase",
         "iconUrl": "https://dreamy-mermaid-13209a.netlify.app/icon.png",
         "homeUrl": "https://dreamy-mermaid-13209a.netlify.app",
         "imageUrl": "https://dreamy-mermaid-13209a.netlify.app/og-image.png",
-        "buttonTitle": "Open Bote App",
+        "buttonTitle": "Open VoteBase",
         "splashImageUrl": "https://dreamy-mermaid-13209a.netlify.app/icon.png",
         "splashBackgroundColor": "#0F0F0F"
     }

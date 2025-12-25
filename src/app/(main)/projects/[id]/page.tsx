@@ -135,7 +135,7 @@ export default function ProjectDetailPage() {
                             <p style={{ color: '#666', fontSize: '12px' }}>@{project.creator?.username || 'user'}</p>
                         </div>
                     </div>
-                    <span style={{ color: '#666', fontSize: '12px' }}>{timeAgo(project.createdAt)}</span>
+                    <span style={{ color: '#666', fontSize: '12px' }}>{timeAgo(String(project.createdAt))}</span>
                 </div>
 
                 {/* About */}
@@ -205,7 +205,7 @@ export default function ProjectDetailPage() {
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                                             <span style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{c.user?.displayName || c.user?.username}</span>
-                                            <span style={{ color: '#666', fontSize: '11px' }}>{timeAgo(c.createdAt)}</span>
+                                            <span style={{ color: '#666', fontSize: '11px' }}>{timeAgo(String(c.createdAt))}</span>
                                         </div>
                                         <p style={{ color: '#ccc', fontSize: '13px', lineHeight: 1.5 }}>{c.content}</p>
                                         <div style={{ display: 'flex', gap: '16px', marginTop: '10px' }}>

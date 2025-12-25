@@ -33,72 +33,48 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             )
         }
 
-        // Check if user already upvoted
-        const existingUpvote = await prisma.upvote.findUnique({
+        // Check rate limit: 1 vote per 12 hours
+        const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000)
+
+        const recentUpvotesCount = await prisma.upvote.count({
             where: {
-                userId_projectId: {
+                userId,
+                createdAt: {
+                    gte: twelveHoursAgo
+                }
+            }
+        })
+
+        // Limit is 1 vote per 12 hours
+        if (recentUpvotesCount >= 1) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: 'You have used your vote for this 12-hour period. Please wait before voting again.'
+                },
+                { status: 429 }
+            )
+        }
+
+        // Add upvote
+        await prisma.$transaction([
+            prisma.upvote.create({
+                data: {
                     userId,
                     projectId,
                 },
-            },
+            }),
+            prisma.project.update({
+                where: { id: projectId },
+                data: { upvoteCount: { increment: 1 } },
+            }),
+        ])
+
+        return NextResponse.json({
+            success: true,
+            action: 'added',
+            message: 'Upvote added',
         })
-
-        if (existingUpvote) {
-            // Remove upvote
-            await prisma.$transaction([
-                prisma.upvote.delete({
-                    where: { id: existingUpvote.id },
-                }),
-                prisma.project.update({
-                    where: { id: projectId },
-                    data: { upvoteCount: { decrement: 1 } },
-                }),
-            ])
-
-            return NextResponse.json({
-                success: true,
-                action: 'removed',
-                message: 'Upvote removed',
-            })
-        } else {
-            // Add upvote
-            await prisma.$transaction([
-                prisma.upvote.create({
-                    data: {
-                        userId,
-                        projectId,
-                    },
-                }),
-                prisma.project.update({
-                    where: { id: projectId },
-                    data: { upvoteCount: { increment: 1 } },
-                }),
-            ])
-
-            // Create notification for project creator (if not self)
-            if (project.creatorId !== userId) {
-                const voter = await prisma.user.findUnique({
-                    where: { id: userId },
-                    select: { username: true, displayName: true },
-                })
-
-                await prisma.notification.create({
-                    data: {
-                        type: 'UPVOTE',
-                        title: 'New Upvote!',
-                        message: `${voter?.displayName || voter?.username} upvoted your project "${project.name}"`,
-                        userId: project.creatorId,
-                        data: { projectId, voterId: userId } as unknown as undefined,
-                    },
-                })
-            }
-
-            return NextResponse.json({
-                success: true,
-                action: 'added',
-                message: 'Upvote added',
-            })
-        }
     } catch (error) {
         console.error('Error toggling upvote:', error)
         return NextResponse.json(

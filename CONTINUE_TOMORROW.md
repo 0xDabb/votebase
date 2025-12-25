@@ -1,29 +1,27 @@
 # 👋 Yarın Buradan Devam Ediyoruz
 
-Merhaba! Dün harika işler başardık (Tasarım yenilendi, Admin paneli bitti, Deploy edildi).
+Tebrikler! Bugün çok büyük ilerleme kaydettik ve Vercel sorunlarını aşıp **Netlify**'da canlıya çıktık! 🚀
 
-Bugün yapman gereken tek şey **beklemekti** (SSL için). Şimdi kontrol zamanı.
+## 🎯 Başlangıç Kontrol Listesi
 
-## 🚀 Başlangıç Kontrol Listesi
+1. **Canlı Siteyi Kontrol Et:**
+   - Link: [https://dreamy-mermaid-13209a.netlify.app](https://dreamy-mermaid-13209a.netlify.app)
+   - Site açılıyor mu?
+   - Projeler listeleniyor mu? (Veritabanı bağlantısı çalışıyor mu?)
 
-1. **Canlı Siteyi Aç:**
-   - Şuraya tıkla: [https://farcast-vote.vercel.app](https://farcast-vote.vercel.app)
-   - **Beklenen:** Site sorunsuz açılmalı, "Güvenli Değil" hatası gitmiş olmalı.
-
-2. **Tasarımı Kontrol Et:**
-   - İkonlar (Home, Activity, Profile) görünüyor mu?
-   - Projeler listeleniyor mu?
-   - Masaüstünde kenarlarda boşluk var mı (mobil görünüm)?
-
-3. **Admin Panelini Test Et:**
-   - [https://farcast-vote.vercel.app/admin](https://farcast-vote.vercel.app/admin) adresine git.
+2. **Admin Panelini Test Et:**
+   - Link: [https://dreamy-mermaid-13209a.netlify.app/admin](https://dreamy-mermaid-13209a.netlify.app/admin)
    - Şifre: `bote2024`
-   - Giriş yapabiliyor musun?
+   - Yeni bir kategori eklemeyi dene.
+
+3. **Geliştirmeye Devam Et:**
+   - Eğer her şey çalışıyorsa, yeni özellikler için hazırsın!
+   - VS Code'u aç ve `npm run dev` ile çalışmaya başla.
 
 ---
 
-### ⚠️ Eğer hala hata alıyorsan:
-Bana "Hala SSL hatası alıyorum" yaz, DNS/Cache temizliği yapalım veya alternatif domain deneyelim.
+### 🆘 Sorun Yaşarsan:
+- **Site boş geliyorsa:** Netlify'daki `DATABASE_URL` ayarını kontrol etmemiz gerekebilir.
+- **Admin'e giremiyorsan:** `NEXTAUTH_URL` ayarını kontrol et.
 
-### ✅ Eğer her şey çalışıyorsa:
-Bana "Site çalışıyor, şimdi ne yapalım?" yaz. (Sırada features geliştirmek var!)
+İyi dinlenmeler! Yarın görüşmek üzere. 👋

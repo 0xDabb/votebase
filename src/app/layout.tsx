@@ -27,11 +27,20 @@ export const metadata: Metadata = {
 
   },
   other: {
-    "fc:frame": "vNext",
-    "fc:frame:image": "https://dreamy-mermaid-13209a.netlify.app/og-image.png",
-    "fc:frame:button:1": "Open VoteBase",
-    "fc:frame:button:1:action": "launch_frame",
-    "fc:frame:button:1:target": "https://dreamy-mermaid-13209a.netlify.app",
+    "fc:frame": JSON.stringify({
+      version: "1",
+      imageUrl: "https://dreamy-mermaid-13209a.netlify.app/og-image.png",
+      button: {
+        title: "Open VoteBase",
+        action: {
+          type: "launch_frame",
+          name: "VoteBase",
+          url: "https://dreamy-mermaid-13209a.netlify.app",
+          splashImageUrl: "https://dreamy-mermaid-13209a.netlify.app/icon.png",
+          splashBackgroundColor: "#0F0F0F"
+        }
+      }
+    })
   },
   manifest: "/manifest.json",
 };

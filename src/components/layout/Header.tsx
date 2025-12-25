@@ -2,14 +2,16 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, BarChart3 } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { BackButton } from '@/components/ui/BackButton'
 
 interface HeaderProps {
     title?: string
     showSearch?: boolean
     showLogo?: boolean
     showProfile?: boolean
+    showBackButton?: boolean
     onSearch?: (query: string) => void
 }
 
@@ -18,19 +20,22 @@ export function Header({
     showSearch = true,
     showLogo = true,
     showProfile = true,
+    showBackButton = false,
     onSearch
 }: HeaderProps) {
     const { user } = useAuth()
 
     return (
         <header className="sticky top-0 left-0 right-0 z-50 bg-[#1A1A1A]/70 backdrop-blur-xl border-b border-white/5 px-4 pt-12 pb-4 flex items-center justify-between gap-4">
-            {/* Logo or Title */}
-            {showLogo ? (
+            {/* Back Button or Logo/Title */}
+            {showBackButton ? (
+                <BackButton />
+            ) : showLogo ? (
                 <Link href="/" className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-[#49df80]/20 flex items-center justify-center text-[#49df80]">
-                        <BarChart3 className="w-5 h-5" />
+                    <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+                        <img src="/icon.png" alt="VoteBase" className="w-full h-full object-cover" />
                     </div>
-                    <span className="font-bold text-lg tracking-tight text-white">Bote</span>
+                    <span className="font-bold text-lg tracking-tight text-white">VoteBase</span>
                 </Link>
             ) : title ? (
                 <h1 className="text-lg font-bold text-white">{title}</h1>
@@ -80,4 +85,3 @@ export function Header({
         </header>
     )
 }
-

@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Share2, Settings } from 'lucide-react'
-import { ProjectCard } from '@/components'
+import { Share2, Settings, ArrowUp, MessageCircle, Zap, Home, Compass, Plus, Bell, User } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
-import { formatNumber } from '@/lib/utils'
 import type { Project } from '@/types'
 
 type ProfileTab = 'projects' | 'upvoted' | 'saved'
@@ -33,7 +31,6 @@ export default function ProfilePage() {
 
         setLoading(true)
         try {
-            // Fetch user profile with stats
             const profileRes = await fetch(`/api/users/${user.id}`)
             const profileData = await profileRes.json()
 
@@ -49,13 +46,11 @@ export default function ProfilePage() {
                 }
             }
 
-            // Fetch tab-specific data
             if (activeTab === 'upvoted') {
                 const params = new URLSearchParams({ userId: user.id })
                 const res = await fetch(`/api/projects?${params}`)
                 const data = await res.json()
                 if (data.success) {
-                    // Filter to only upvoted
                     setProjects(data.data.filter((p: Project) => p.hasUpvoted))
                 }
             } else if (activeTab === 'saved') {
@@ -72,143 +67,146 @@ export default function ProfilePage() {
         }
     }
 
+    const fmt = (n: number) => n >= 1000 ? (n / 1000).toFixed(1).replace('.0', '') + 'k' : n.toString()
+
     if (authLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="w-8 h-8 border-2 border-[#44e47e] border-t-transparent rounded-full animate-spin" />
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a' }}>
+                <div style={{ width: '32px', height: '32px', border: '2px solid #49df80', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
             </div>
         )
     }
 
     if (!user) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
-                <div className="w-20 h-20 rounded-full bg-[#1A1A1A] flex items-center justify-center mb-4">
-                    <span className="text-4xl">🔐</span>
+            <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0a0a0a', padding: '20px', textAlign: 'center' }}>
+                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: '#161616', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+                    <span style={{ fontSize: '40px' }}>🔐</span>
                 </div>
-                <h1 className="text-2xl font-bold text-white mb-2">Sign In Required</h1>
-                <p className="text-[#A0A0A0] mb-6">
-                    Connect with Farcaster to view your profile
-                </p>
-                <p className="text-xs text-[#A0A0A0]">
-                    Open this app in Warpcast to sign in automatically
-                </p>
+                <h1 style={{ color: '#fff', fontSize: '24px', fontWeight: 700, marginBottom: '8px' }}>Sign In Required</h1>
+                <p style={{ color: '#888', marginBottom: '24px' }}>Connect with Farcaster to view your profile</p>
+                <p style={{ color: '#666', fontSize: '12px' }}>Open this app in Warpcast to sign in automatically</p>
             </div>
         )
     }
 
     return (
-        <>
-            {/* Top App Bar */}
-            <header className="sticky top-0 z-40 bg-[#0F0F0F]/80 backdrop-blur-md border-b border-white/5">
-                <div className="flex items-center justify-between px-4 py-3 pt-12">
-                    <h2 className="text-white text-lg font-bold tracking-tight">Profile</h2>
-                    <div className="flex gap-4">
-                        <button className="flex items-center justify-center text-white hover:text-[#44e47e] transition-colors">
-                            <Share2 className="w-6 h-6" />
-                        </button>
-                        <button className="flex items-center justify-center text-white hover:text-[#44e47e] transition-colors">
-                            <Settings className="w-6 h-6" />
-                        </button>
-                    </div>
+        <div style={{ minHeight: '100vh', background: '#0a0a0a', paddingBottom: '120px' }}>
+            {/* Header */}
+            <div style={{ position: 'sticky', top: 0, zIndex: 50, padding: '16px 20px', paddingTop: '48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)', borderBottom: '1px solid #1a1a1a' }}>
+                <h2 style={{ color: '#fff', fontSize: '18px', fontWeight: 700 }}>Profile</h2>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <button style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#161616', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888' }}>
+                        <Share2 style={{ width: '18px', height: '18px' }} />
+                    </button>
+                    <button style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#161616', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888' }}>
+                        <Settings style={{ width: '18px', height: '18px' }} />
+                    </button>
                 </div>
-            </header>
+            </div>
 
             {/* Profile Info */}
-            <section className="flex flex-col items-center px-4 pt-6 pb-2">
-                <div className="relative mb-4">
-                    {/* Avatar Ring */}
-                    <div className="p-1 rounded-full bg-gradient-to-tr from-[#44e47e] to-transparent">
-                        <div className="relative h-28 w-28 rounded-full border-4 border-[#0F0F0F] overflow-hidden">
+            <div style={{ padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                <div style={{ position: 'relative', marginBottom: '16px' }}>
+                    <div style={{ padding: '3px', borderRadius: '50%', background: 'linear-gradient(135deg, #49df80, #2a9d5f)' }}>
+                        <div style={{ width: '100px', height: '100px', borderRadius: '50%', border: '4px solid #0a0a0a', overflow: 'hidden', background: '#161616' }}>
                             {user.avatarUrl ? (
-                                <Image
-                                    src={user.avatarUrl}
-                                    alt={user.displayName || user.username}
-                                    fill
-                                    className="object-cover"
-                                />
+                                <Image src={user.avatarUrl} alt={user.displayName || user.username} width={100} height={100} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             ) : (
-                                <div className="w-full h-full bg-[#1A1A1A] flex items-center justify-center">
-                                    <span className="text-4xl font-bold text-[#A0A0A0]">
-                                        {user.username.charAt(0).toUpperCase()}
-                                    </span>
+                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px', fontWeight: 700, color: '#888' }}>
+                                    {user.username.charAt(0).toUpperCase()}
                                 </div>
                             )}
                         </div>
                     </div>
-                    {/* Online Indicator */}
-                    <div className="absolute bottom-2 right-2 h-5 w-5 rounded-full bg-[#44e47e] border-4 border-[#0F0F0F]" />
+                    <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '20px', height: '20px', borderRadius: '50%', background: '#49df80', border: '4px solid #0a0a0a' }} />
                 </div>
 
-                <div className="text-center space-y-1">
-                    <h1 className="text-2xl font-bold text-white tracking-tight">
-                        {user.displayName || user.username}
-                    </h1>
-                    <p className="text-[#44e47e] font-medium">@{user.username}</p>
-                </div>
-            </section>
+                <h1 style={{ color: '#fff', fontSize: '24px', fontWeight: 700, marginBottom: '4px' }}>
+                    {user.displayName || user.username}
+                </h1>
+                <p style={{ color: '#49df80', fontSize: '14px', fontWeight: 600 }}>@{user.username}</p>
+            </div>
 
-            {/* Stats Row */}
-            <section className="px-4 py-6 w-full">
-                <div className="flex w-full gap-3 justify-between">
-                    <div className="flex flex-1 flex-col gap-1 rounded-2xl bg-[#1A1A1A] p-4 items-center text-center border border-white/5 shadow-lg">
-                        <p className="text-white text-xl font-bold">{stats.projectCount}</p>
-                        <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Projects</p>
+            {/* Stats */}
+            <div style={{ padding: '0 20px 24px 20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px' }}>
+                    <div style={{ padding: '16px', borderRadius: '16px', background: '#161616', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
+                        <p style={{ color: '#fff', fontSize: '20px', fontWeight: 700, marginBottom: '4px' }}>{stats.projectCount}</p>
+                        <p style={{ color: '#666', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Projects</p>
                     </div>
-                    <div className="flex flex-1 flex-col gap-1 rounded-2xl bg-[#1A1A1A] p-4 items-center text-center border border-white/5 shadow-lg">
-                        <p className="text-white text-xl font-bold">{formatNumber(stats.totalUpvotes)}</p>
-                        <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Upvotes</p>
+                    <div style={{ padding: '16px', borderRadius: '16px', background: '#161616', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
+                        <p style={{ color: '#fff', fontSize: '20px', fontWeight: 700, marginBottom: '4px' }}>{fmt(stats.totalUpvotes)}</p>
+                        <p style={{ color: '#666', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Upvotes</p>
                     </div>
-                    <div className="flex flex-1 flex-col gap-1 rounded-2xl bg-[#1A1A1A] p-4 items-center text-center border border-white/5 shadow-lg">
-                        <p className="text-white text-xl font-bold">{stats.savedCount}</p>
-                        <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Saved</p>
+                    <div style={{ padding: '16px', borderRadius: '16px', background: '#161616', border: '1px solid rgba(255,255,255,0.06)', textAlign: 'center' }}>
+                        <p style={{ color: '#fff', fontSize: '20px', fontWeight: 700, marginBottom: '4px' }}>{stats.savedCount}</p>
+                        <p style={{ color: '#666', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Saved</p>
                     </div>
                 </div>
-            </section>
+            </div>
 
             {/* Tabs */}
-            <section className="px-4 pb-6 sticky top-[60px] z-30 bg-[#0F0F0F] pt-2">
-                <div className="flex h-12 w-full items-center rounded-full bg-[#1A1A1A] p-1 border border-white/5">
+            <div style={{ padding: '0 20px 16px 20px', position: 'sticky', top: '76px', zIndex: 40, background: '#0a0a0a', paddingTop: '8px' }}>
+                <div style={{ display: 'flex', height: '44px', borderRadius: '22px', background: '#161616', padding: '4px', border: '1px solid rgba(255,255,255,0.06)' }}>
                     {(['projects', 'upvoted', 'saved'] as ProfileTab[]).map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`flex-1 h-full rounded-full font-semibold text-sm transition-all duration-200 ${activeTab === tab
-                                    ? 'bg-[#44e47e] text-black'
-                                    : 'text-gray-400'
-                                }`}
+                            style={{
+                                flex: 1,
+                                height: '100%',
+                                borderRadius: '18px',
+                                fontSize: '13px',
+                                fontWeight: 600,
+                                border: 'none',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                background: activeTab === tab ? '#49df80' : 'transparent',
+                                color: activeTab === tab ? '#000' : '#888'
+                            }}
                         >
                             {tab === 'projects' ? 'My Projects' : tab === 'upvoted' ? 'Upvoted' : 'Saved'}
                         </button>
                     ))}
                 </div>
-            </section>
+            </div>
 
             {/* Projects Grid */}
-            <section className="px-4 pb-6">
+            <div style={{ padding: '0 20px' }}>
                 {loading ? (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                         {[...Array(4)].map((_, i) => (
-                            <div key={i} className="aspect-[4/5] rounded-2xl bg-[#1A1A1A] animate-pulse" />
+                            <div key={i} style={{ height: '180px', borderRadius: '20px', background: '#161616', animation: 'pulse 2s infinite' }} />
                         ))}
                     </div>
                 ) : projects.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-4">
-                        {projects.map((project, index) => (
-                            <div
-                                key={project.id}
-                                className={index === 2 ? 'col-span-2' : ''}
-                            >
-                                <ProjectCard
-                                    project={project}
-                                    variant={index === 2 ? 'featured' : 'default'}
-                                />
-                            </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        {projects.map((p) => (
+                            <Link href={`/projects/${p.id}`} key={p.id} style={{ textDecoration: 'none' }}>
+                                <div style={{ borderRadius: '20px', padding: '14px', height: '180px', display: 'flex', flexDirection: 'column', background: '#161616' }}>
+                                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: p.category?.color ? `${p.category.color}20` : '#49df8020', marginBottom: '10px' }}>
+                                        <Zap style={{ width: '18px', height: '18px', color: p.category?.color || '#49df80' }} />
+                                    </div>
+                                    <h3 style={{ color: '#fff', fontSize: '14px', fontWeight: 700, margin: '0 0 2px 0' }}>{p.name}</h3>
+                                    <p style={{ color: '#888', fontSize: '11px', margin: 0, lineHeight: 1.4, flex: 1 }}>{p.tagline}</p>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', paddingTop: '8px', borderTop: '1px solid #222' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                            <ArrowUp style={{ width: '12px', height: '12px', color: '#49df80' }} />
+                                            <span style={{ fontSize: '11px', fontWeight: 700, color: '#49df80' }}>{fmt(p.upvoteCount)}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#555' }}>
+                                            <MessageCircle style={{ width: '12px', height: '12px' }} />
+                                            <span style={{ fontSize: '10px' }}>{p._count?.comments || 0}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
                         ))}
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <p className="text-[#A0A0A0]">
+                    <div style={{ textAlign: 'center', padding: '48px 20px' }}>
+                        <p style={{ color: '#888', marginBottom: '16px' }}>
                             {activeTab === 'projects'
                                 ? "You haven't created any projects yet"
                                 : activeTab === 'upvoted'
@@ -217,16 +215,40 @@ export default function ProfilePage() {
                             }
                         </p>
                         {activeTab === 'projects' && (
-                            <Link
-                                href="/create"
-                                className="inline-block mt-4 px-6 py-2 rounded-full bg-[#44e47e] text-black font-semibold text-sm"
-                            >
+                            <Link href="/create" style={{ display: 'inline-block', padding: '12px 24px', borderRadius: '12px', background: '#49df80', color: '#000', fontWeight: 600, fontSize: '14px', textDecoration: 'none' }}>
                                 Create Project
                             </Link>
                         )}
                     </div>
                 )}
-            </section>
-        </>
+            </div>
+
+            {/* Bottom Nav */}
+            <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, padding: '12px 24px 32px 24px', background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid #1a1a1a' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: '360px', margin: '0 auto' }}>
+                    <Link href="/" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+                        <Home style={{ width: '24px', height: '24px', color: '#666' }} />
+                        <span style={{ fontSize: '10px', color: '#666' }}>Home</span>
+                    </Link>
+                    <Link href="/explore" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+                        <Compass style={{ width: '24px', height: '24px', color: '#666' }} />
+                        <span style={{ fontSize: '10px', color: '#666' }}>Explore</span>
+                    </Link>
+                    <Link href="/create" style={{ position: 'relative', top: '-20px', textDecoration: 'none' }}>
+                        <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#49df80', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 24px rgba(73,223,128,0.4)' }}>
+                            <Plus style={{ width: '28px', height: '28px', color: '#000', strokeWidth: 2.5 }} />
+                        </div>
+                    </Link>
+                    <Link href="/notifications" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+                        <Bell style={{ width: '24px', height: '24px', color: '#666' }} />
+                        <span style={{ fontSize: '10px', color: '#666' }}>Activity</span>
+                    </Link>
+                    <Link href="/profile" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
+                        <User style={{ width: '24px', height: '24px', color: '#49df80', fill: '#49df80' }} />
+                        <span style={{ fontSize: '10px', color: '#49df80' }}>Profile</span>
+                    </Link>
+                </div>
+            </nav>
+        </div>
     )
 }

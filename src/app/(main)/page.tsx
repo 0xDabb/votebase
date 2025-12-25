@@ -3,17 +3,33 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
-import { BarChart3, Search, TrendingUp, ArrowUp, MessageCircle, Home, Compass, Plus, Bell, User, Zap, Bookmark } from 'lucide-react'
+import { Search, TrendingUp, ArrowUp, MessageCircle, Home, Compass, Plus, Bell, User, Zap, X } from 'lucide-react'
 import type { Project, Category } from '@/types'
 
 export default function HomePage() {
     const { user } = useAuth()
     const [projects, setProjects] = useState<Project[]>([])
+    const [filteredProjects, setFilteredProjects] = useState<Project[]>([])
     const [categories, setCategories] = useState<Category[]>([])
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [showSearch, setShowSearch] = useState(false)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => { fetchData() }, [selectedCategory, user])
+
+    useEffect(() => {
+        if (searchQuery.trim()) {
+            const filtered = projects.filter(p =>
+                p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.tagline?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                p.description?.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+            setFilteredProjects(filtered)
+        } else {
+            setFilteredProjects(projects)
+        }
+    }, [searchQuery, projects])
 
     async function fetchData() {
         setLoading(true)
@@ -28,7 +44,10 @@ export default function HomePage() {
 
             const projRes = await fetch(`/api/projects?${params}`)
             const projData = await projRes.json()
-            if (projData.success) setProjects(projData.data)
+            if (projData.success) {
+                setProjects(projData.data)
+                setFilteredProjects(projData.data)
+            }
         } catch (e) { console.error(e) }
         finally { setLoading(false) }
     }
@@ -40,13 +59,13 @@ export default function HomePage() {
     }
 
     const fmt = (n: number) => n >= 1000 ? (n / 1000).toFixed(1).replace('.0', '') + 'k' : n.toString()
-    const featured = projects.find(p => p.featured)
-    const regular = projects.filter(p => !p.featured)
+    const featured = filteredProjects.find(p => p.featured)
+    const regular = filteredProjects.filter(p => !p.featured)
 
     return (
         <div style={{ background: '#0a0a0a', minHeight: '100vh' }}>
 
-            {/* ===== HEADER - Exact match ===== */}
+            {/* HEADER */}
             <div style={{ padding: '24px 20px 16px 20px' }}>
                 <div style={{
                     display: 'flex',
@@ -64,33 +83,97 @@ export default function HomePage() {
                             width: '36px',
                             height: '36px',
                             borderRadius: '10px',
-                            background: '#49df80',
+                            overflow: 'hidden',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                         }}>
-                            <BarChart3 style={{ width: '20px', height: '20px', color: '#000' }} />
+                            <img src="/icon.png" alt="VoteBase" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
-                        <span style={{ color: '#fff', fontWeight: 700, fontSize: '16px' }}>Honestpoll</span>
+                        <span style={{ color: '#fff', fontWeight: 700, fontSize: '16px' }}>VoteBase</span>
                     </Link>
 
-                    {/* Search */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {/* Search Button */}
+                    <button onClick={() => setShowSearch(!showSearch)} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', padding: '8px' }}>
                         <Search style={{ width: '16px', height: '16px', color: '#666' }} />
                         <span style={{ color: '#666', fontSize: '14px' }}>Search...</span>
-                    </div>
+                    </button>
 
                     {/* Avatar */}
-                    <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #ff7b54, #ffb347)'
-                    }} />
+                    <Link href="/profile" style={{ textDecoration: 'none' }}>
+                        <div style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            background: user?.avatarUrl ? 'transparent' : 'linear-gradient(135deg, #49df80, #2a9d5f)',
+                            overflow: 'hidden'
+                        }}>
+                            {user?.avatarUrl ? (
+                                <img src={user.avatarUrl} alt={user.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            ) : (
+                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 700 }}>
+                                    {user?.username?.charAt(0).toUpperCase() || '?'}
+                                </div>
+                            )}
+                        </div>
+                    </Link>
                 </div>
             </div>
 
-            {/* ===== CATEGORY PILLS ===== */}
+            {/* SEARCH BAR (Expandable) */}
+            {showSearch && (
+                <div style={{ padding: '0 20px 16px 20px' }}>
+                    <div style={{ position: 'relative' }}>
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search projects..."
+                            autoFocus
+                            style={{
+                                width: '100%',
+                                height: '48px',
+                                padding: '0 48px 0 16px',
+                                borderRadius: '24px',
+                                background: '#161616',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                                color: '#fff',
+                                fontSize: '14px',
+                                outline: 'none'
+                            }}
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                style={{
+                                    position: 'absolute',
+                                    right: '12px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    width: '24px',
+                                    height: '24px',
+                                    borderRadius: '50%',
+                                    background: '#49df80',
+                                    border: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                <X style={{ width: '14px', height: '14px', color: '#000' }} />
+                            </button>
+                        )}
+                    </div>
+                    {searchQuery && (
+                        <p style={{ color: '#888', fontSize: '12px', marginTop: '8px', paddingLeft: '16px' }}>
+                            Found {filteredProjects.length} {filteredProjects.length === 1 ? 'project' : 'projects'}
+                        </p>
+                    )}
+                </div>
+            )}
+
+            {/* CATEGORY PILLS */}
             <div style={{ padding: '0 20px 16px 20px', display: 'flex', gap: '8px', overflowX: 'auto', scrollbarWidth: 'none', msOverflowStyle: 'none' }} className="hide-scrollbar">
                 <button onClick={() => setSelectedCategory(null)} style={{
                     height: '36px', padding: '0 20px', borderRadius: '18px', border: 'none',
@@ -119,7 +202,7 @@ export default function HomePage() {
                 ))}
             </div>
 
-            {/* ===== FEATURED PROJECT ===== */}
+            {/* FEATURED PROJECT */}
             {featured && (
                 <div style={{ padding: '0 20px 12px 20px' }}>
                     <Link href={`/projects/${featured.id}`} style={{ textDecoration: 'none' }}>
@@ -145,7 +228,7 @@ export default function HomePage() {
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#666' }}>
                                         <MessageCircle style={{ width: '14px', height: '14px' }} />
-                                        <span style={{ fontSize: '11px' }}>{featured._count?.comments || 128}</span>
+                                        <span style={{ fontSize: '11px' }}>{featured._count?.comments || 0}</span>
                                     </div>
                                 </div>
                             </div>
@@ -154,7 +237,7 @@ export default function HomePage() {
                 </div>
             )}
 
-            {/* ===== PROJECT GRID ===== */}
+            {/* PROJECT GRID */}
             <div style={{ padding: '0 20px 120px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 {loading ? (
                     [...Array(4)].map((_, i) => <div key={i} style={{ height: '180px', borderRadius: '20px', background: '#161616' }} />)
@@ -184,7 +267,7 @@ export default function HomePage() {
                 )}
             </div>
 
-            {/* ===== BOTTOM NAV ===== */}
+            {/* BOTTOM NAV */}
             <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, padding: '12px 24px 32px 24px', background: 'rgba(10,10,10,0.95)', backdropFilter: 'blur(20px)', borderTop: '1px solid #1a1a1a' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: '360px', margin: '0 auto' }}>
                     <Link href="/" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>

@@ -16,20 +16,25 @@ model User {
   fid            Int       @unique // Farcaster ID
   username       String    @unique
   displayName    String?
+  bio            String?   // User bio/tagline
   avatarUrl      String?
   custodyAddress String?
+  upvoteCount    Int       @default(0) // Votes received by this user
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
   // Relations
-  projects      Project[]
-  upvotes       Upvote[]
-  comments      Comment[]
-  savedProjects SavedProject[]
-  notifications Notification[]
+  projects         Project[]
+  upvotes          Upvote[]
+  creatorUpvotes   CreatorUpvote[] @relation("UserCreatorUpvotes")
+  receivedUpvotes  CreatorUpvote[] @relation("CreatorReceivedUpvotes")
+  comments         Comment[]
+  savedProjects    SavedProject[]
+  notifications    Notification[]
 
   @@index([fid])
   @@index([username])
+  @@index([upvoteCount(sort: Desc)])
 }
 
 // Project Model
@@ -154,4 +159,20 @@ model Notification {
 
   @@index([userId])
   @@index([read])
+}
+
+// Creator Upvotes (separate from project upvotes)
+model CreatorUpvote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId     String
+  user       User     @relation("UserCreatorUpvotes", fields: [userId], references: [id], onDelete: Cascade)
+  creatorId  String
+  creator    User     @relation("CreatorReceivedUpvotes", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, creatorId])
+  @@index([creatorId])
+  @@index([userId])
+  @@index([userId, createdAt])
 }

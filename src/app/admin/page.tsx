@@ -25,19 +25,40 @@ interface Category {
     _count?: { projects: number }
 }
 
+interface Creator {
+    id: string
+    fid: number
+    username: string
+    displayName: string | null
+    bio: string | null
+    avatarUrl: string | null
+    upvoteCount: number
+    createdAt: string
+    _count: {
+        projects: number
+        comments: number
+    }
+}
+
 export default function AdminPage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [password, setPassword] = useState('')
     const [projects, setProjects] = useState<Project[]>([])
     const [categories, setCategories] = useState<Category[]>([])
+    const [creators, setCreators] = useState<Creator[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
-    const [activeTab, setActiveTab] = useState<'projects' | 'categories'>('projects')
+    const [activeTab, setActiveTab] = useState<'projects' | 'categories' | 'creators'>('projects')
 
     // Category form
     const [showCategoryForm, setShowCategoryForm] = useState(false)
     const [editingCategory, setEditingCategory] = useState<Category | null>(null)
     const [categoryForm, setCategoryForm] = useState({ name: '', slug: '', description: '', color: '#49df80' })
+
+    // Creator form
+    const [showCreatorForm, setShowCreatorForm] = useState(false)
+    const [editingCreator, setEditingCreator] = useState<Creator | null>(null)
+    const [creatorForm, setCreatorForm] = useState({ fid: '', username: '', displayName: '', bio: '', avatarUrl: '' })
 
     const ADMIN_PASSWORD = 'bote2024'
 
@@ -69,13 +90,19 @@ export default function AdminPage() {
     async function fetchData() {
         setLoading(true)
         try {
-            const [projRes, catRes] = await Promise.all([
+            const [projRes, catRes, creatorRes] = await Promise.all([
                 fetch('/api/projects?pageSize=100'),
-                fetch('/api/admin/categories')
+                fetch('/api/admin/categories'),
+                fetch('/api/admin/users')
             ])
-            const [projData, catData] = await Promise.all([projRes.json(), catRes.json()])
+            const [projData, catData, creatorData] = await Promise.all([
+                projRes.json(),
+                catRes.json(),
+                creatorRes.json()
+            ])
             if (projData.success) setProjects(projData.data)
             if (catData.success) setCategories(catData.data)
+            if (creatorData.success) setCreators(creatorData.data)
         } catch (err) {
             console.error('Error:', err)
         } finally {
@@ -158,6 +185,54 @@ export default function AdminPage() {
         setShowCategoryForm(true)
     }
 
+    // Creator functions
+    async function handleCreatorSubmit(e: React.FormEvent) {
+        e.preventDefault()
+        try {
+            const url = editingCreator
+                ? `/api/admin/users/${editingCreator.id}`
+                : '/api/admin/users'
+            const method = editingCreator ? 'PATCH' : 'POST'
+
+            const res = await fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(creatorForm)
+            })
+
+            if (res.ok) {
+                fetchData()
+                setShowCreatorForm(false)
+                setEditingCreator(null)
+                setCreatorForm({ fid: '', username: '', displayName: '', bio: '', avatarUrl: '' })
+            }
+        } catch (err) {
+            console.error('Error:', err)
+        }
+    }
+
+    async function deleteCreator(id: string) {
+        if (!confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return
+        try {
+            const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' })
+            if (res.ok) fetchData()
+        } catch (err) {
+            console.error('Error:', err)
+        }
+    }
+
+    function editCreator(creator: Creator) {
+        setEditingCreator(creator)
+        setCreatorForm({
+            fid: creator.fid.toString(),
+            username: creator.username,
+            displayName: creator.displayName || '',
+            bio: creator.bio || '',
+            avatarUrl: creator.avatarUrl || ''
+        })
+        setShowCreatorForm(true)
+    }
+
     // Login Screen
     if (!isAuthenticated) {
         return (
@@ -220,6 +295,13 @@ export default function AdminPage() {
                     >
                         <FolderOpen style={{ width: '18px', height: '18px' }} />
                         Kategoriler ({categories.length})
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('creators')}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', borderRadius: '12px', border: 'none', cursor: 'pointer', background: activeTab === 'creators' ? '#49df80' : '#161616', color: activeTab === 'creators' ? '#000' : '#888', fontWeight: 600 }}
+                    >
+                        <Plus style={{ width: '18px', height: '18px' }} />
+                        Creators ({creators.length})
                     </button>
                 </div>
 
@@ -358,6 +440,109 @@ export default function AdminPage() {
                                                 <Edit style={{ width: '16px', height: '16px' }} />
                                             </button>
                                             <button onClick={() => deleteCategory(cat.id)} style={{ padding: '8px', borderRadius: '8px', background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>
+                                                <Trash2 style={{ width: '16px', height: '16px' }} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Creators Tab */}
+                {activeTab === 'creators' && (
+                    <div style={{ borderRadius: '16px', overflow: 'hidden', background: '#161616', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#fff' }}>Creators</h2>
+                            <button onClick={() => { setShowCreatorForm(true); setEditingCreator(null); setCreatorForm({ fid: '', username: '', displayName: '', bio: '', avatarUrl: '' }) }} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', borderRadius: '10px', background: '#49df80', color: '#000', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                                <Plus style={{ width: '18px', height: '18px' }} />
+                                Yeni Creator
+                            </button>
+                        </div>
+
+                        {/* Creator Form Modal */}
+                        {showCreatorForm && (
+                            <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.08)', background: '#0a0a0a' }}>
+                                <form onSubmit={handleCreatorSubmit}>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                                        <input
+                                            type="number"
+                                            placeholder="Farcaster ID (FID)"
+                                            value={creatorForm.fid}
+                                            onChange={(e) => setCreatorForm({ ...creatorForm, fid: e.target.value })}
+                                            style={{ padding: '10px', borderRadius: '8px', background: '#161616', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', outline: 'none' }}
+                                            required
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Username"
+                                            value={creatorForm.username}
+                                            onChange={(e) => setCreatorForm({ ...creatorForm, username: e.target.value })}
+                                            style={{ padding: '10px', borderRadius: '8px', background: '#161616', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', outline: 'none' }}
+                                            required
+                                        />
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px', marginBottom: '12px' }}>
+                                        <input
+                                            type="text"
+                                            placeholder="Display Name (opsiyonel)"
+                                            value={creatorForm.displayName}
+                                            onChange={(e) => setCreatorForm({ ...creatorForm, displayName: e.target.value })}
+                                            style={{ padding: '10px', borderRadius: '8px', background: '#161616', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', outline: 'none' }}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Bio (opsiyonel)"
+                                            value={creatorForm.bio}
+                                            onChange={(e) => setCreatorForm({ ...creatorForm, bio: e.target.value })}
+                                            style={{ padding: '10px', borderRadius: '8px', background: '#161616', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', outline: 'none' }}
+                                        />
+                                        <input
+                                            type="url"
+                                            placeholder="Avatar URL (opsiyonel)"
+                                            value={creatorForm.avatarUrl}
+                                            onChange={(e) => setCreatorForm({ ...creatorForm, avatarUrl: e.target.value })}
+                                            style={{ padding: '10px', borderRadius: '8px', background: '#161616', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', outline: 'none' }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                        <button type="submit" style={{ padding: '10px 20px', borderRadius: '8px', background: '#49df80', color: '#000', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                                            {editingCreator ? 'Güncelle' : 'Ekle'}
+                                        </button>
+                                        <button type="button" onClick={() => { setShowCreatorForm(false); setEditingCreator(null) }} style={{ padding: '10px 20px', borderRadius: '8px', background: '#333', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer' }}>
+                                            İptal
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
+
+                        <div style={{ padding: '16px' }}>
+                            <div style={{ display: 'grid', gap: '12px' }}>
+                                {creators.map((creator) => (
+                                    <div key={creator.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', borderRadius: '12px', background: '#0a0a0a' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: creator.avatarUrl ? 'transparent' : 'linear-gradient(135deg, #49df80, #2a9d5f)', overflow: 'hidden', border: '2px solid rgba(73, 223, 128, 0.2)' }}>
+                                                {creator.avatarUrl ? (
+                                                    <img src={creator.avatarUrl} alt={creator.username} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                ) : (
+                                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 700, fontSize: '18px' }}>
+                                                        {creator.username.charAt(0).toUpperCase()}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p style={{ color: '#fff', fontWeight: 600 }}>{creator.displayName || creator.username}</p>
+                                                <p style={{ color: '#666', fontSize: '12px' }}>@{creator.username} · FID: {creator.fid}</p>
+                                                <p style={{ color: '#888', fontSize: '11px' }}>{creator.upvoteCount} votes · {creator._count.projects} projects</p>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <button onClick={() => editCreator(creator)} style={{ padding: '8px', borderRadius: '8px', background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>
+                                                <Edit style={{ width: '16px', height: '16px' }} />
+                                            </button>
+                                            <button onClick={() => deleteCreator(creator.id)} style={{ padding: '8px', borderRadius: '8px', background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}>
                                                 <Trash2 style={{ width: '16px', height: '16px' }} />
                                             </button>
                                         </div>

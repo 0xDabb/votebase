@@ -34,22 +34,30 @@ export default function HomePage() {
     async function fetchData() {
         setLoading(true)
         try {
-            const catRes = await fetch('/api/categories')
-            const catData = await catRes.json()
-            if (catData.success) setCategories(catData.data)
-
+            // Build project query parameters
             const params = new URLSearchParams({ sortBy: 'upvotes', pageSize: '20' })
             if (selectedCategory) params.set('categoryId', selectedCategory)
             if (user?.id) params.set('userId', user.id)
 
-            const projRes = await fetch(`/api/projects?${params}`)
-            const projData = await projRes.json()
+            // Parallel fetch - much faster than sequential
+            const [catData, projData] = await Promise.all([
+                fetch('/api/categories').then(res => res.json()),
+                fetch(`/api/projects?${params}`).then(res => res.json())
+            ])
+
+            // Update state with fetched data
+            if (catData.success) setCategories(catData.data)
             if (projData.success) {
                 setProjects(projData.data)
                 setFilteredProjects(projData.data)
             }
-        } catch (e) { console.error(e) }
-        finally { setLoading(false) }
+        } catch (e) {
+            console.error('Error fetching data:', e)
+            // Show user-friendly error message
+            alert('Failed to load data. Please refresh the page.')
+        } finally {
+            setLoading(false)
+        }
     }
 
     async function handleUpvote(id: string) {

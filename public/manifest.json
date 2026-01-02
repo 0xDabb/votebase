@@ -15,9 +15,9 @@
   ],
   "frame": {
     "version": "vNext",
-    "imageUrl": "https://dreamy-mermaid-13209a.netlify.app/og-image.png",
-    "splashImageUrl": "https://dreamy-mermaid-13209a.netlify.app/icon.png",
+    "imageUrl": "https://votebase.vercel.app/og-image.png",
+    "splashImageUrl": "https://votebase.vercel.app/icon.png",
     "splashBackgroundColor": "#0F0F0F",
-    "homeUrl": "https://dreamy-mermaid-13209a.netlify.app"
+    "homeUrl": "https://votebase.vercel.app"
   }
 }

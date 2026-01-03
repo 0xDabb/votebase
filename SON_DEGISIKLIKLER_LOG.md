@@ -1,4 +1,108 @@
 # VoteBase - Son Değişiklikler Günlüğü
+
+---
+
+## 🔧 3 Ocak 2026 - Vercel SSL Hatası Çözümü
+
+**Tarih:** 3 Ocak 2026, 03:59  
+**Oturum:** SSL/ERR_SSL_PROTOCOL_ERROR Sorunu Çözümü
+
+---
+
+### 🐛 Karşılaşılan Sorun
+
+Kullanıcı `https://votebase0301.vercel.app` adresine erişmeye çalışırken tarayıcıda şu hata alıyordu:
+
+```
+Bu site güvenli bağlantı sağlayamıyor
+votebase0301.vercel.app geçersiz bir yanıt gönderdi.
+ERR_SSL_PROTOCOL_ERROR
+```
+
+### 🔍 Sorunun Kök Nedeni
+
+**1. Asıl Sorun: Vercel Build Cache Bozulması**
+- Eski bir build sırasında veritabanı bağlantısı veya Prisma şeması ile ilgili bir sorun oluşmuştu
+- Vercel bu hatalı durumu cache'lemişti
+- Sonraki deploy'larda bile bu bozuk cache kullanılmaya devam ediyordu
+
+**2. Görünen Sorun:**
+- Uygulama düzgün başlatılamıyor ve **500 Internal Server Error** döndürüyordu
+- Vercel'in edge network'ü bu 500 hatasını **SSL hatası olarak gösteriyordu** (çünkü uygulama hiç yanıt veremiyordu)
+
+**3. İlk Yanlış Teşhisler:**
+- Veritabanı tabloları eksik (P3005 hatası)
+- SSL sertifikası sorunu
+- Domain yapılandırması hatası
+
+### ✅ Uygulanan Çözümler
+
+#### 1. vercel.json Güncellendi
+```json
+{
+    "buildCommand": "prisma generate && npx prisma db push && next build",
+    "installCommand": "npm install",
+    "framework": "nextjs",
+    "regions": ["fra1"]
+}
+```
+
+**Değişiklikler:**
+- `installCommand`: Sadece `npm install` (Prisma komutu build aşamasına taşındı)
+- `buildCommand`: `prisma generate && npx prisma db push && next build`
+  - Önce Prisma client oluşturuluyor
+  - Sonra veritabanı şeması senkronize ediliyor
+  - En son Next.js build yapılıyor
+
+#### 2. Yerel Ortam Temizliği
+```powershell
+# Node süreçleri durduruldu
+Get-Process node | Stop-Process -Force
+
+# Prisma cache temizlendi
+Remove-Item -Recurse -Force ".\node_modules\.prisma"
+
+# Bağımlılıklar yeniden kuruldu
+npm install
+```
+
+#### 3. Vercel Cache Temizlenerek Redeploy
+- Vercel Dashboard > Deployments
+- Son deployment'ın üç nokta menüsü > "Redeploy"
+- **"Use existing Build Cache" seçeneği KAPALI** (Bu kritik adım!)
+- Temiz bir build başlatıldı
+
+#### 4. Domain SSL Yenileme
+- Vercel Settings > Domains
+- "Refresh" butonuna tıklandı
+- SSL sertifikası yeniden doğrulandı
+
+### 📊 Sonuç
+
+| Önceki Durum | Sonraki Durum |
+|--------------|---------------|
+| ❌ ERR_SSL_PROTOCOL_ERROR | ✅ Site açılıyor |
+| ❌ 500 Internal Server Error | ✅ 200 OK |
+| ❌ Veritabanı bağlantı hatası | ✅ Veritabanı senkronize |
+| ❌ Bozuk build cache | ✅ Temiz build |
+
+### 💡 Öğrenilen Dersler
+
+1. **SSL hatası her zaman SSL sorunu değildir** - Uygulama hiç yanıt veremediğinde de bu hata görünebilir
+2. **Build cache sorun olabilir** - Vercel'de cache temizleyerek redeploy yapmak çoğu sorunu çözer
+3. **Prisma komutları doğru sırada olmalı** - `generate` > `db push` > `next build`
+
+### 🗒️ Tarayıcı Cache Notu
+
+Düzeltmeden sonra bazı tarayıcılar hâlâ eski SSL hatasını gösterebilir. Çözüm:
+- **Ctrl + Shift + R** (Zorla yenile)
+- **Ctrl + Shift + Delete** (Cache temizle)
+- **Gizli pencere** ile deneyin
+
+---
+
+## 📅 26 Aralık 2024 - UI/UX İyileştirmeleri
+
 **Tarih:** 26 Aralık 2024, 01:04  
 **Oturum:** UI/UX İyileştirmeleri ve Activity Sayfası
 

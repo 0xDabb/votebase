@@ -12,7 +12,7 @@
         "splashImageUrl": "https://votebase0301.vercel.app/icon.png",
         "splashBackgroundColor": "#0F0F0F",
         "webhookUrl": "https://votebase0301.vercel.app/api/webhook",
-        "subtitle": "Discover & Vote",
+        "subtitle": "Discover and Vote",
         "description": "Discover amazing projects, upvote your favorites, and connect with builders on Farcaster.",
         "primaryCategory": "social",
         "tags": [

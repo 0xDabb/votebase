@@ -12,12 +12,5 @@
       "sizes": "200x200",
       "type": "image/png"
     }
-  ],
-  "frame": {
-    "version": "vNext",
-    "imageUrl": "https://votebase0301.vercel.app/og-image.png",
-    "splashImageUrl": "https://votebase0301.vercel.app/icon.png",
-    "splashBackgroundColor": "#0F0F0F",
-    "homeUrl": "https://votebase0301.vercel.app"
-  }
+  ]
 }

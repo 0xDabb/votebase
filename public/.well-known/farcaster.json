@@ -4,25 +4,27 @@
         "payload": "eyJkb21haW4iOiJ2b3RlYmFzZTAzMDEudmVyY2VsLmFwcCJ9",
         "signature": "aO9Z/TIaWkUjGhpBZFAZK0IPpY5cqc2HiUiwaQ3WUW4nN1H5OwNkkcigCxiDDv/Y61m+yb1pBYIs5boYkQ4+nhs="
     },
-    "frame": {
-        "version": "1",
-        "name": "VoteBase",
-        "homeUrl": "https://votebase0301.vercel.app",
-        "iconUrl": "https://votebase0301.vercel.app/icon.png",
-        "imageUrl": "https://votebase0301.vercel.app/og-image.png",
-        "buttonTitle": "Open VoteBase",
-        "splashImageUrl": "https://votebase0301.vercel.app/icon.png",
-        "splashBackgroundColor": "#0F0F0F",
-        "webhookUrl": "https://votebase0301.vercel.app/api/webhook"
-    },
     "miniapp": {
         "version": "1",
         "name": "VoteBase",
         "homeUrl": "https://votebase0301.vercel.app",
         "iconUrl": "https://votebase0301.vercel.app/icon.png",
-        "description": "Discover amazing projects, upvote your favorites, and connect with builders on Farcaster.",
         "splashImageUrl": "https://votebase0301.vercel.app/icon.png",
         "splashBackgroundColor": "#0F0F0F",
-        "primaryCategory": "social"
+        "webhookUrl": "https://votebase0301.vercel.app/api/webhook",
+        "subtitle": "Discover & Vote",
+        "description": "Discover amazing projects, upvote your favorites, and connect with builders on Farcaster.",
+        "primaryCategory": "social",
+        "tags": [
+            "projects",
+            "voting",
+            "farcaster",
+            "base"
+        ],
+        "heroImageUrl": "https://votebase0301.vercel.app/og-image.png",
+        "tagline": "Vote for Projects",
+        "ogTitle": "VoteBase",
+        "ogDescription": "Discover and vote for amazing projects on Farcaster.",
+        "ogImageUrl": "https://votebase0301.vercel.app/og-image.png"
     }
 }

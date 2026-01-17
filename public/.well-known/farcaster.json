@@ -7,24 +7,25 @@
     "miniapp": {
         "version": "1",
         "name": "VoteBase",
-        "homeUrl": "https://votebase0301.vercel.app",
         "iconUrl": "https://votebase0301.vercel.app/icon.png",
+        "homeUrl": "https://votebase0301.vercel.app",
+        "imageUrl": "https://votebase0301.vercel.app/og-image.png",
+        "buttonTitle": "🚀 Open VoteBase",
         "splashImageUrl": "https://votebase0301.vercel.app/icon.png",
         "splashBackgroundColor": "#0F0F0F",
         "webhookUrl": "https://votebase0301.vercel.app/api/webhook",
-        "subtitle": "Discover and Vote",
-        "description": "Discover amazing projects, upvote your favorites, and connect with builders on Farcaster.",
+        "subtitle": "Discover & Vote for Projects",
+        "description": "Discover amazing Web3 projects, upvote your favorites, and connect with builders on Farcaster. Vote once every 12 hours!",
         "primaryCategory": "social",
         "tags": [
             "projects",
             "voting",
             "farcaster",
-            "base"
+            "base",
+            "web3",
+            "discover"
         ],
         "heroImageUrl": "https://votebase0301.vercel.app/og-image.png",
-        "tagline": "Vote for Projects",
-        "ogTitle": "VoteBase",
-        "ogDescription": "Discover and vote for amazing projects on Farcaster.",
-        "ogImageUrl": "https://votebase0301.vercel.app/og-image.png"
+        "tagline": "Vote for the Best Web3 Projects"
     }
 }

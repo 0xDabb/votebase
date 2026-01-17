@@ -31,12 +31,12 @@ export const metadata: Metadata = {
     images: [`${APP_URL}/og-image.png`],
   },
   other: {
-    // Farcaster Mini App embed metadata (new format)
+    // Farcaster Mini App embed metadata (version 1 for production)
     "fc:miniapp": JSON.stringify({
-      version: "next",
+      version: "1",
       imageUrl: `${APP_URL}/og-image.png`,
       button: {
-        title: "Open VoteBase",
+        title: "🚀 Open VoteBase",
         action: {
           type: "launch_miniapp",
           name: "VoteBase",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
       version: "1",
       imageUrl: `${APP_URL}/og-image.png`,
       button: {
-        title: "Open VoteBase",
+        title: "🚀 Open VoteBase",
         action: {
           type: "launch_frame",
           name: "VoteBase",

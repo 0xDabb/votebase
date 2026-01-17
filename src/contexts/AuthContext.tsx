@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
-import sdk from '@farcaster/miniapp-sdk'
+import { sdk } from '@farcaster/miniapp-sdk'
 import type { User } from '@/types'
 
 interface AuthContextType {
@@ -9,6 +9,7 @@ interface AuthContextType {
     loading: boolean
     isAuthenticated: boolean
     isInFrame: boolean
+    farcasterContext: any | null
     signIn: () => Promise<void>
     signOut: () => void
     refreshUser: () => Promise<void>
@@ -32,45 +33,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null)
     const [loading, setLoading] = useState(true)
     const [isInFrame, setIsInFrame] = useState(false)
+    const [farcasterContext, setFarcasterContext] = useState<any | null>(null)
 
     const isAuthenticated = !!user
 
     // Initialize - check for existing session and Farcaster context
     const initAuth = useCallback(async () => {
         setLoading(true)
+        console.log('[VoteBase Auth] Starting initialization...')
+
         try {
             // Check if we're in a Farcaster frame context
             if (typeof window !== 'undefined') {
+                const inFrame = window.parent !== window
+                console.log('[VoteBase Auth] In frame:', inFrame)
+
                 // IMMEDIATELY call ready - don't wait for anything
-                // This is critical for Warpcast PC to dismiss splash screen
+                // This is critical for Warpcast to dismiss splash screen
                 try {
-                    sdk.actions.ready()
-                    console.log('Farcaster SDK ready called immediately')
+                    await sdk.actions.ready()
+                    console.log('[VoteBase Auth] SDK ready called')
                 } catch (e) {
-                    console.warn('Failed to call ready immediately:', e)
+                    console.warn('[VoteBase Auth] Failed to call ready:', e)
                 }
 
-                // Create shorter timeout (3 seconds for faster fallback)
-                const timeoutPromise = new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('SDK initialization timeout')), 3000)
-                )
-
+                // Try to get context with timeout protection
                 try {
-                    // Try to get context with timeout protection
-                    const contextPromise = sdk.context
-                    const context: any = await Promise.race([
-                        contextPromise,
+                    const context = await Promise.race([
+                        sdk.context,
                         new Promise((_, reject) =>
-                            setTimeout(() => reject(new Error('SDK context timeout')), 2000)
+                            setTimeout(() => reject(new Error('SDK context timeout')), 3000)
                         )
-                    ])
+                    ]) as any
 
-                    console.log('Farcaster SDK context:', context)
+                    console.log('[VoteBase Auth] Farcaster context:', context)
+                    setFarcasterContext(context)
 
                     if (context?.user) {
                         setIsInFrame(true)
+                        console.log('[VoteBase Auth] User from context:', context.user)
 
-                        // We have a Farcaster user, authenticate with our backend
+                        // Authenticate with our backend
                         const response = await fetch('/api/auth/farcaster', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -79,33 +82,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
                                 username: context.user.username || `fid:${context.user.fid}`,
                                 displayName: context.user.displayName,
                                 avatarUrl: context.user.pfpUrl,
+                                custodyAddress: context.user.custody,
                             }),
                         })
 
                         if (response.ok) {
                             const data = await response.json()
+                            console.log('[VoteBase Auth] User authenticated:', data.user)
                             setUser(data.user)
+                        } else {
+                            console.error('[VoteBase Auth] Auth response not ok:', response.status)
                         }
                     } else {
-                        console.log('No Farcaster user in context')
+                        console.log('[VoteBase Auth] No Farcaster user in context')
                     }
                 } catch (sdkError) {
-                    console.warn('SDK initialization failed or timed out:', sdkError)
-                    // SDK failed, but app should still work as normal website
+                    console.warn('[VoteBase Auth] SDK context failed:', sdkError)
                     setIsInFrame(false)
-                    // Call ready again as fallback
-                    try {
-                        sdk.actions.ready()
-                    } catch (e) {
-                        // Ignore
-                    }
                 }
             }
         } catch (error) {
-            console.error('Auth init error:', error)
-            // Not in a Farcaster frame, that's okay for local dev
+            console.error('[VoteBase Auth] Init error:', error)
         } finally {
             setLoading(false)
+            console.log('[VoteBase Auth] Initialization complete')
         }
     }, [])
 
@@ -113,13 +113,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
         initAuth()
     }, [initAuth])
 
+    // Sign in (re-trigger auth flow)
     async function signIn() {
-        // Re-trigger the auth flow
+        console.log('[VoteBase Auth] Sign in triggered')
+
+        // If we're in a frame but not authenticated, try SDK signin
+        if (typeof window !== 'undefined' && window.parent !== window) {
+            try {
+                // Use SDK signIn with correct options
+                const result = await sdk.actions.signIn({
+                    nonce: crypto.randomUUID(),
+                })
+                console.log('[VoteBase Auth] SDK sign in result:', result)
+            } catch (e) {
+                console.warn('[VoteBase Auth] SDK signin failed:', e)
+            }
+        }
+
         await initAuth()
     }
 
     function signOut() {
+        console.log('[VoteBase Auth] Sign out')
         setUser(null)
+        setFarcasterContext(null)
     }
 
     async function refreshUser() {
@@ -132,7 +149,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 setUser(data.user)
             }
         } catch (error) {
-            console.error('Error refreshing user:', error)
+            console.error('[VoteBase Auth] Error refreshing user:', error)
         }
     }
 
@@ -143,6 +160,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 loading,
                 isAuthenticated,
                 isInFrame,
+                farcasterContext,
                 signIn,
                 signOut,
                 refreshUser,

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Share2, ArrowUp, ExternalLink, Send, ThumbsUp, MessageCircle, Globe, Github, Home, Compass, Plus, Bell, User } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import { composeCast, openUrl } from '@/lib/farcaster'
 import type { Project, Comment } from '@/types'
 
 export default function ProjectDetailPage() {
@@ -73,18 +74,21 @@ export default function ProjectDetailPage() {
         }
     }
 
-    function handleShare() {
+    async function handleShare() {
         if (!project) return
 
-        const url = `https://dreamy-mermaid-13209a.netlify.app/projects/${projectId}`
+        const url = `https://votebase0301.vercel.app/projects/${projectId}`
         const defaultMessage = `Check out ${project.name} on VoteBase! 🚀\n\n${project.tagline}`
 
-        // Create Farcaster cast URL
+        // Create message
         const message = shareMessage.trim() || defaultMessage
-        const castUrl = `https://warpcast.com/~/compose?text=${encodeURIComponent(message)}&embeds[]=${encodeURIComponent(url)}`
 
-        // Open in new window
-        window.open(castUrl, '_blank')
+        // Use Farcaster SDK composeCast (will fallback to Warpcast URL if not in Mini App)
+        await composeCast({
+            text: message,
+            embeds: [url]
+        })
+
         setShowShareDialog(false)
         setShareMessage('')
     }

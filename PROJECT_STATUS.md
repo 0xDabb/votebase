@@ -1,97 +1,218 @@
-# VoteBase Project Status - 4 Ocak 2026
-
-## ✅ MEVCUT DURUM: LOKAL ÇALIŞIYOR
-
-### Database Bağlantısı
-- ✅ **Supabase PostgreSQL** bağlantısı başarılı
-- ✅ Tablolar oluşturuldu (`prisma db push`)
-- ✅ Seed verileri eklendi
-
-### Veri Durumu (Lokal)
-| Tür | Sayı |
-|-----|------|
-| Projeler | 8 |
-| Kategoriler | 12 |
-| Creators | 11 |
-
-### Eklenen Projeler
-1. Base (5800 upvote) - Jesse Pollak
-2. Warpcast (4250 upvote) - Dan Romero
-3. Coinbase Wallet (3420 upvote) - Jesse Pollak
-4. Farcaster Frames (3100 upvote) - Dan Romero
-5. Zora (2340 upvote) - Vitalik Buterin
-6. Neynar (1680 upvote) - horsefacts
-7. Paragraph (1450 upvote) - Linda Xie
-8. Supercast (892 upvote) - horsefacts
-
-### Eklenen Kategoriler
-SaaS, AI Tools, Productivity, Crypto, Mobile, Design, DevTools, Fintech, Social, Games, Web3, E-commerce
-
-### Eklenen Creators
-Vitalik, Dan Romero, Jesse Pollak, horsefacts, Linda, Balaji, Chris Dixon, Naval, punk6529, Sassal
+# VoteBase - Proje Durumu
+**Son Güncelleme:** 20 Ocak 2026, 02:14
 
 ---
 
-## 🔧 YAPILANLAR
+## 🌐 Canlı URL'ler
 
-1. ✅ `.env` dosyası güncellendi (Supabase credentials)
-2. ✅ `prisma generate` çalıştırıldı
-3. ✅ `prisma db push` ile tablolar oluşturuldu
-4. ✅ `seed.ts` dosyasına projeler eklendi
-5. ✅ Seed çalıştırıldı - tüm veriler eklendi
-6. ✅ Lokal test başarılı - http://localhost:3000
+| Platform | URL | Durum |
+|----------|-----|-------|
+| **Vercel** | https://votebase0301.vercel.app | ✅ Çalışıyor |
+| **Admin Panel** | https://votebase0301.vercel.app/admin | Şifre: `bote2024` |
 
 ---
 
-## 📋 VERCELe DEPLOY İÇİN YAPILACAKLAR
+## 📊 Teknoloji Stack
 
-### 1. Git Push (Terminal'de)
+| Teknoloji | Versiyon |
+|-----------|----------|
+| Next.js | 16.1.1 |
+| React | 19.2.3 |
+| Prisma | 5.22.0 |
+| PostgreSQL | Supabase |
+| Farcaster SDK | @farcaster/miniapp-sdk 0.2.1 |
+| TailwindCSS | 4.x |
+| Hosting | Vercel |
+
+---
+
+## ✅ Tamamlanan Özellikler
+
+### Temel Özellikler
+- ✅ Proje listeleme (upvote sıralı)
+- ✅ Proje detay sayfası
+- ✅ Upvote sistemi (12 saatte 1 oy)
+- ✅ Yorum sistemi
+- ✅ Kategori filtreleme
+- ✅ Proje kaydetme/bookmark
+- ✅ Arama fonksiyonu
+- ✅ Admin paneli
+
+### Farcaster Entegrasyonu
+- ✅ Mini App manifest (`farcaster.json`)
+- ✅ Otomatik SDK ready() çağrısı
+- ✅ Farcaster kullanıcı otomatik giriş
+- ✅ Warpcast'te Mini App olarak açılma
+- ✅ Cast paylaşımı (composeCast)
+
+### YENİ: Push Notification Sistemi (20 Ocak 2026)
+- ✅ User modeline notification alanları eklendi
+- ✅ Webhook handler güncellendi (token depolama)
+- ✅ `/api/notifications/send` API oluşturuldu
+- ✅ `useFarcasterActions` hook oluşturuldu
+- ✅ `AddToFarcasterButton` bileşeni oluşturuldu
+- ✅ `ShareButton` bileşeni oluşturuldu
+- ✅ Ana sayfaya notification banner eklendi
+
+---
+
+## 📁 Proje Yapısı
+
+```
+bote-app/
+├── prisma/
+│   ├── schema.prisma      # Veritabanı şeması
+│   └── seed.ts            # Örnek veri
+├── public/
+│   ├── .well-known/
+│   │   └── farcaster.json # Mini App manifest
+│   ├── icon.png           # Uygulama ikonu
+│   └── og-image.png       # Open Graph görseli
+├── src/
+│   ├── app/
+│   │   ├── (main)/
+│   │   │   ├── page.tsx           # Ana sayfa
+│   │   │   ├── explore/           # Keşfet
+│   │   │   ├── projects/[id]/     # Proje detay
+│   │   │   ├── profile/           # Profil
+│   │   │   ├── notifications/     # Bildirimler
+│   │   │   └── create/            # Proje oluştur
+│   │   ├── admin/                 # Admin paneli
+│   │   ├── api/
+│   │   │   ├── auth/farcaster/    # Farcaster auth
+│   │   │   ├── projects/          # Proje API
+│   │   │   ├── categories/        # Kategori API
+│   │   │   ├── users/             # Kullanıcı API
+│   │   │   ├── webhook/           # Farcaster webhook
+│   │   │   ├── notifications/send/ # Bildirim gönderme (YENİ)
+│   │   │   └── admin/             # Admin API
+│   │   ├── layout.tsx             # Root layout
+│   │   └── globals.css            # Global stiller
+│   ├── components/
+│   │   ├── farcaster/             # Farcaster bileşenleri (YENİ)
+│   │   │   ├── AddToFarcasterButton.tsx
+│   │   │   ├── ShareButton.tsx
+│   │   │   └── index.ts
+│   │   ├── layout/
+│   │   ├── projects/
+│   │   └── FrameSDKInit.tsx
+│   ├── contexts/
+│   │   └── AuthContext.tsx        # Authentication
+│   ├── hooks/                     # Custom hooks (YENİ)
+│   │   ├── useFarcasterActions.ts
+│   │   └── index.ts
+│   ├── lib/
+│   │   ├── prisma.ts
+│   │   └── farcaster.ts
+│   └── types/
+│       └── index.ts
+├── .env                           # Environment variables
+├── package.json
+└── next.config.ts
+```
+
+---
+
+## 🗃️ Veritabanı Modelleri
+
+| Model | Açıklama |
+|-------|----------|
+| User | Farcaster kullanıcıları |
+| Project | Projeler |
+| Category | Kategoriler |
+| Upvote | Oy kayıtları |
+| Comment | Yorumlar |
+| SavedProject | Kaydedilen projeler |
+| Notification | Bildirimler |
+| CreatorUpvote | Creator oyları |
+
+### User Modeli (Güncel)
+```prisma
+model User {
+  id                   String    @id @default(cuid())
+  fid                  Int       @unique
+  username             String    @unique
+  displayName          String?
+  bio                  String?
+  avatarUrl            String?
+  custodyAddress       String?
+  upvoteCount          Int       @default(0)
+  
+  // Farcaster Notification Settings (YENİ)
+  notificationToken    String?
+  notificationUrl      String?
+  notificationsEnabled Boolean   @default(false)
+  miniAppAdded         Boolean   @default(false)
+  
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
+```
+
+---
+
+## 🔧 Environment Variables
+
+```env
+DATABASE_URL=postgresql://...@supabase.com:5432/postgres
+NEXTAUTH_SECRET=votebase-nextauth-secret-2024-production
+NEXTAUTH_URL=https://votebase0301.vercel.app
+ADMIN_PASSWORD=bote2024
+```
+
+---
+
+## 📝 Yapılacaklar (TODO)
+
+### Kısa Vadeli
+- [ ] Git push yap (değişiklikler local'de)
+- [ ] Vercel'de deploy durumunu kontrol et
+- [ ] Warpcast'te notification test et
+- [ ] Supabase bağlantısını kontrol et
+
+### Orta Vadeli
+- [ ] Wallet entegrasyonu (Wagmi + @farcaster/miniapp-wagmi-connector)
+- [ ] Neynar API ile signature doğrulama
+- [ ] Analytics ekleme
+- [ ] Rate limiting iyileştirme
+
+### Uzun Vadeli
+- [ ] NFT rozet sistemi
+- [ ] Leaderboard
+- [ ] Proje kategorileri genişletme
+- [ ] Multi-language desteği
+
+---
+
+## 📚 Dokümantasyon Dosyaları
+
+| Dosya | İçerik |
+|-------|--------|
+| `PROJECT_STATUS.md` | Bu dosya |
+| `FARCASTER_INTEGRATION_LOG.md` | Farcaster entegrasyon detayları |
+| `FARCASTER_UPDATE_LOG_20_JAN.md` | 20 Ocak güncellemeleri |
+| `CONTINUE_TOMORROW.md` | Devam noktaları |
+| `VERCEL_DEPLOYMENT.md` | Vercel deploy notları |
+
+---
+
+## 🚀 Deploy Komutları
+
 ```bash
+# Lokal geliştirme
+npm run dev
+
+# Prisma
+npx prisma generate
+npx prisma db push
+npx prisma db seed
+
+# Git push (manuel)
 git add .
-git commit -m "Add Supabase integration and sample projects"
+git commit -m "Add Farcaster notification system"
 git push origin main
 ```
 
-### 2. Vercel Environment Variables
-Vercel Dashboard → Settings → Environment Variables'da şu değişkenlerin olduğundan emin olun:
-
-```
-DATABASE_URL = postgres://postgres.uuwinswsltvvvxnbsoaj:vaiDpdEC65M3DCgn@aws-1-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require
-NEXTAUTH_SECRET = votebase-nextauth-secret-2024-production
-ADMIN_PASSWORD = bote2024
-```
-
-### 3. Vercel Redeploy
-Vercel Dashboard → Deployments → En son deployment'a "Redeploy" tıklayın
-
-### 4. Supabase'de Seed Çalıştırma
-Vercel'de seed otomatik çalışmadığı için, Supabase SQL Editor'da manuel olarak `prisma/seed.sql` içeriğini çalıştırın.
-
 ---
 
-## 🌐 URL'LER
-
-- **Lokal:** http://localhost:3000 ✅
-- **Admin Panel:** http://localhost:3000/admin (şifre: bote2024)
-- **Vercel:** https://votebase0301.vercel.app (deploy sonrası kontrol edilmeli)
-
----
-
-## 🔐 Supabase Bilgileri
-
-- **Project URL:** https://uuwinswsltvvvxnbsoaj.supabase.co
-- **Database Host:** db.uuwinswsltvvvxnbsoaj.supabase.co
-- **Region:** US East 1
-
----
-
-## 📁 Önemli Dosyalar
-
-- `ENV_CREDENTIALS.txt` - Supabase credentials (lokal test için)
-- `prisma/seed.ts` - Seed script (kategoriler, kullanıcılar, projeler)
-- `prisma/seed.sql` - SQL seed (Supabase SQL Editor için)
-- `prisma/schema.prisma` - Database schema
-
----
-
-**Son Güncelleme:** 4 Ocak 2026, 23:20
+**Durum:** ✅ Kod hazır, deploy bekliyor

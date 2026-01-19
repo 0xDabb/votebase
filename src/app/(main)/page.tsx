@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import { Search, TrendingUp, ArrowUp, MessageCircle, Home, Compass, Plus, Bell, User, Zap, X } from 'lucide-react'
 import type { Project, Category } from '@/types'
+import { AddToFarcasterButton } from '@/components/farcaster/AddToFarcasterButton'
 
 export default function HomePage() {
     const { user } = useAuth()
@@ -127,6 +128,9 @@ export default function HomePage() {
                     </Link>
                 </div>
             </div>
+
+            {/* ADD TO FARCASTER BANNER */}
+            <AddToFarcasterButton variant="banner" />
 
             {/* SEARCH BAR (Expandable) */}
             {showSearch && (

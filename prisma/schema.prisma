@@ -23,6 +23,12 @@ model User {
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 
+  // Farcaster Notification Settings
+  notificationToken   String?   // Token for sending push notifications
+  notificationUrl     String?   // URL to send notifications to (Farcaster client API)
+  notificationsEnabled Boolean  @default(false) // Whether user has enabled notifications
+  miniAppAdded        Boolean   @default(false) // Whether user has added the mini app
+
   // Relations
   projects         Project[]
   upvotes          Upvote[]
@@ -35,6 +41,7 @@ model User {
   @@index([fid])
   @@index([username])
   @@index([upvoteCount(sort: Desc)])
+  @@index([notificationsEnabled])
 }
 
 // Project Model
